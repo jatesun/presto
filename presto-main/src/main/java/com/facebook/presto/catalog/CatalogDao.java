@@ -1,8 +1,25 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.facebook.presto.catalog;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,13 +31,15 @@ import java.util.Map;
  * @author sunjiantao
  * @date 2020-12-14
  */
-public class CatalogDao {
+public class CatalogDao
+{
     public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     public static final String JDBC_URL = "jdbc:mysql://localhost:3306/jiaodong?characterEncoding=utf8&useSSL=false&serverTimeZone=Asia/Shanghai";
     public static final String JDBC_USER = "root";
     public static final String JDBC_PASSWORD = "123456";
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         CatalogDao dao = new CatalogDao();
         CatalogInfo info = new CatalogInfo();
         Map<String, String> properties = new HashMap<>();
@@ -33,12 +52,14 @@ public class CatalogDao {
             dao.save(info);
 //            dao.getAll();
 //            dao.delete(2);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void save(CatalogInfo catalogInfo) throws Exception {
+    public void save(CatalogInfo catalogInfo) throws Exception
+    {
         // JDBC连接的URL, 不同数据库有不同的格式:
         Class.forName(JDBC_DRIVER);
         try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)) {
@@ -54,7 +75,8 @@ public class CatalogDao {
         }
     }
 
-    public List<CatalogInfo> getAll() throws Exception {
+    public List<CatalogInfo> getAll() throws Exception
+    {
         // JDBC连接的URL, 不同数据库有不同的格式:
         Class.forName(JDBC_DRIVER);
         try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)) {
@@ -84,7 +106,8 @@ public class CatalogDao {
         }
     }
 
-    public void delete(Integer id) throws Exception {
+    public void delete(Integer id) throws Exception
+    {
         Class.forName(JDBC_DRIVER);
         try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)) {
             try (PreparedStatement ps = conn.prepareStatement(

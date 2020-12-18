@@ -22,9 +22,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 
 import javax.inject.Inject;
+
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +38,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public class DynamicCatalogStore {
+public class DynamicCatalogStore
+{
     private static final Logger log = Logger.get(DynamicCatalogStore.class);
     private final ConnectorManager connectorManager;
     private final File catalogConfigurationDir;
@@ -44,29 +50,34 @@ public class DynamicCatalogStore {
     private final Map<String, CatalogInfo> catalogInfoCache = new HashMap<>();
 
     @Inject
-    public DynamicCatalogStore(ConnectorManager connectorManager, StaticCatalogStoreConfig config) {
+    public DynamicCatalogStore(ConnectorManager connectorManager, StaticCatalogStoreConfig config)
+    {
         this(connectorManager,
                 config.getCatalogConfigurationDir(),
                 firstNonNull(config.getDisabledCatalogs(), ImmutableList.of()));
     }
 
-    public DynamicCatalogStore(ConnectorManager connectorManager, File catalogConfigurationDir, List<String> disabledCatalogs) {
+    public DynamicCatalogStore(ConnectorManager connectorManager, File catalogConfigurationDir, List<String> disabledCatalogs)
+    {
         this.connectorManager = connectorManager;
         this.catalogConfigurationDir = catalogConfigurationDir;
         this.disabledCatalogs = ImmutableSet.copyOf(disabledCatalogs);
     }
 
-    public boolean areCatalogsLoaded() {
+    public boolean areCatalogsLoaded()
+    {
         return catalogsLoaded.get();
     }
 
     public void loadCatalogs()
-            throws Exception {
+            throws Exception
+    {
         loadCatalogs(ImmutableMap.of());
     }
 
     public void loadCatalogs(Map<String, Map<String, String>> additionalCatalogs)
-            throws Exception {
+            throws Exception
+    {
         if (!catalogsLoading.compareAndSet(false, true)) {
             return;
         }
@@ -77,9 +88,11 @@ public class DynamicCatalogStore {
 //        }
         //todo 修改为从mysql数据库加载方法。
         load();
-        scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
+        scheduledExecutorService.scheduleWithFixedDelay(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 reload();
             }
         }, 60, 60, TimeUnit.SECONDS);
@@ -94,26 +107,32 @@ public class DynamicCatalogStore {
      * 2、执行loadcatalog方法
      * 3、cataloginfo添加到cataloginfo cache
      */
-    private void load() {
+    private void load()
+    {
         CatalogDao catalogDao = new CatalogDao();
         List<CatalogInfo> catalogInfoList = new ArrayList<>();
         try {
             catalogInfoList = catalogDao.getAll();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
-        catalogInfoList.forEach(catalogInfo -> {
+        catalogInfoList.forEach(catalogInfo ->
+        {
             try {
                 loadCatalog(catalogInfo);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         });
         putIntoCache(catalogInfoList);
     }
 
-    private void putIntoCache(List<CatalogInfo> info) {
-        info.forEach(i -> {
+    private void putIntoCache(List<CatalogInfo> info)
+    {
+        info.forEach(i ->
+        {
             catalogInfoCache.put(i.getCatalogName(), i);
         });
     }
@@ -123,22 +142,26 @@ public class DynamicCatalogStore {
      * 2、与现有的cataloginfo cache对比
      * 3、对新增、修改、删除的cataloginfo操作。
      */
-    private void reload() {
+    private void reload()
+    {
         CatalogDao catalogDao = new CatalogDao();
         List<CatalogInfo> newestCatInfo = new ArrayList<>();
         try {
             newestCatInfo = catalogDao.getAll();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         catalogInfoCache.clear();
-        newestCatInfo.forEach(i -> {
+        newestCatInfo.forEach(i ->
+        {
             catalogInfoCache.put(i.getCatalogName(), i);
         });
     }
 
     private void loadCatalog(CatalogInfo catalogInfo)
-            throws Exception {
+            throws Exception
+    {
         String catalogName = Files.getNameWithoutExtension(catalogInfo.getCatalogName());
 
         log.info("-- Loading catalog properties %s --", catalogInfo.getCatalogName());
@@ -147,7 +170,8 @@ public class DynamicCatalogStore {
         loadCatalog(catalogName, properties);
     }
 
-    private void loadCatalog(String catalogName, Map<String, String> properties) {
+    private void loadCatalog(String catalogName, Map<String, String> properties)
+    {
         if (disabledCatalogs.contains(catalogName)) {
             log.info("Skipping disabled catalog %s", catalogName);
             return;
@@ -160,7 +184,8 @@ public class DynamicCatalogStore {
         for (Entry<String, String> entry : properties.entrySet()) {
             if (entry.getKey().equals("connector.name")) {
                 connectorName = entry.getValue();
-            } else {
+            }
+            else {
                 connectorProperties.put(entry.getKey(), entry.getValue());
             }
         }
@@ -171,7 +196,8 @@ public class DynamicCatalogStore {
         log.info("-- Added catalog %s using connector %s --", catalogName, connectorName);
     }
 
-    private static List<File> listFiles(File installedPluginsDir) {
+    private static List<File> listFiles(File installedPluginsDir)
+    {
         if (installedPluginsDir != null && installedPluginsDir.isDirectory()) {
             File[] files = installedPluginsDir.listFiles();
             if (files != null) {

@@ -19,6 +19,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 
 import javax.validation.constraints.NotNull;
+
 import java.io.File;
 import java.util.List;
 
@@ -27,35 +28,41 @@ import java.util.List;
  * @date 2020年12月14日
  * 从数据获取mysql数据库相关配置
  */
-public class DynamicCatalogStoreConfig {
+public class DynamicCatalogStoreConfig
+{
     private static final Splitter SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
 
     private File catalogConfigurationDir = new File("etc/catalog/");
     private List<String> disabledCatalogs;
 
     @NotNull
-    public File getCatalogConfigurationDir() {
+    public File getCatalogConfigurationDir()
+    {
         return catalogConfigurationDir;
     }
 
     @LegacyConfig("plugin.config-dir")
     @Config("catalog.config-dir")
-    public DynamicCatalogStoreConfig setCatalogConfigurationDir(File dir) {
+    public DynamicCatalogStoreConfig setCatalogConfigurationDir(File dir)
+    {
         this.catalogConfigurationDir = dir;
         return this;
     }
 
-    public List<String> getDisabledCatalogs() {
+    public List<String> getDisabledCatalogs()
+    {
         return disabledCatalogs;
     }
 
     @Config("catalog.disabled-catalogs")
-    public DynamicCatalogStoreConfig setDisabledCatalogs(String catalogs) {
+    public DynamicCatalogStoreConfig setDisabledCatalogs(String catalogs)
+    {
         this.disabledCatalogs = (catalogs == null) ? null : SPLITTER.splitToList(catalogs);
         return this;
     }
 
-    public DynamicCatalogStoreConfig setDisabledCatalogs(List<String> catalogs) {
+    public DynamicCatalogStoreConfig setDisabledCatalogs(List<String> catalogs)
+    {
         this.disabledCatalogs = (catalogs == null) ? null : ImmutableList.copyOf(catalogs);
         return this;
     }
