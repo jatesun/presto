@@ -34,9 +34,9 @@ import java.util.Map;
 public class CatalogDao
 {
     public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    public static final String JDBC_URL = "jdbc:mysql://localhost:3306/jiaodong?characterEncoding=utf8&useSSL=false&serverTimeZone=Asia/Shanghai";
+    public static final String JDBC_URL = "jdbc:mysql://10.42.42.252:3306/test?characterEncoding=utf8&useSSL=false&serverTimeZone=Asia/Shanghai";
     public static final String JDBC_USER = "root";
-    public static final String JDBC_PASSWORD = "123456";
+    public static final String JDBC_PASSWORD = "Root1234@";
 
     public static void main(String[] args)
     {
